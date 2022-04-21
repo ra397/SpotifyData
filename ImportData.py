@@ -4,13 +4,15 @@ with open('MyData/StreamingHistory1.json', 'r', encoding='utf-8') as f:
     streaming_data = json.load(f)
 
 
-def convert_time(ms):
-    seconds = (ms / 1000) % 60
-    seconds = int(seconds)
-    minutes = (ms / (1000 * 60)) % 60
-    minutes = int(minutes)
-    hours = (ms / (1000 * 60 * 60)) % 24
-    return "%d:%d:%d" % (hours, minutes, seconds)
+def convert_from_ms(milliseconds):
+    seconds, milliseconds = divmod(milliseconds, 1000)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    days, hours = divmod(hours, 24)
+    seconds = seconds + milliseconds / 1000
+    seconds = round(seconds)
+    hours += (days*24)
+    return '{}:{}:{}'.format(hours, minutes, seconds)
 
 
 # This function sorts artists by total listening time (in descending order)
@@ -26,7 +28,7 @@ def rank_artist(stream_log):
             artist_dict[stream['artistName']] = current_msPlayed
     artist_dict = dict(sorted(artist_dict.items(), key=lambda item: item[1], reverse=True))
     for artists in artist_dict.keys():
-        artist_dict[artists] = convert_time(artist_dict.get(artists))
+        artist_dict[artists] = convert_from_ms(artist_dict.get(artists))
     return artist_dict
 
 
