@@ -62,12 +62,23 @@ def rank_data(stream_log, rank_by, library=None):
     return artist_dict
 
 
-# rank songs not in library
+# ranks your favorite songs that are not currently in your library
 def song_not_in_library(stream_log, library):
+    song_dict = {}
     songs_in_library = []
     for song in library:
         songs_in_library.append(song['track'])
-    print(songs_in_library)
+    for stream in stream_log:
+        if stream['trackName'] not in songs_in_library and stream['trackName'] not in song_dict.keys():
+            song_dict[stream['trackName']] = stream['msPlayed']
+        elif stream['trackName'] not in songs_in_library:
+            current_msPlayed = song_dict.get(stream['trackName'])
+            current_msPlayed += stream['msPlayed']
+            song_dict[stream['trackName']] = current_msPlayed
+    song_dict = dict(sorted(song_dict.items(), key=lambda item: item[1], reverse=True))
+    for song in song_dict.keys():
+        song_dict[song] = convert_from_ms(song_dict.get(song))
+    return song_dict
 
 
-song_not_in_library(streaming_data, library_data)
+print(song_not_in_library(streaming_data, library_data))
