@@ -17,28 +17,6 @@ def convert_from_ms(milliseconds):
     return '{}:{}:{}'.format(hours, minutes, seconds)
 
 
-# This function sorts artists/tracks by total listening time (in descending order)
-def rank_data(stream_log, rank_by):
-    if rank_by != 'artist' and rank_by != 'track':
-        return 'Invalid input'
-    if rank_by == 'artist':
-        rank_by = 'artistName'
-    if rank_by == 'track':
-        rank_by = 'trackName'
-    artist_dict = {}
-    for stream in stream_log:
-        if stream[rank_by] not in artist_dict.keys():
-            artist_dict.update({stream[rank_by]: stream['msPlayed']})
-        else:
-            current_msPlayed = artist_dict.get(stream[rank_by])
-            current_msPlayed += stream['msPlayed']
-            artist_dict[stream[rank_by]] = current_msPlayed
-    artist_dict = dict(sorted(artist_dict.items(), key=lambda item: item[1], reverse=True))
-    for artists in artist_dict.keys():
-        artist_dict[artists] = convert_from_ms(artist_dict.get(artists))
-    return artist_dict
-
-
 # This function sorts albums in descending order, album 'None' is all the songs not present in the
 # libray grouped together. Under the assumption the listening time for songs in that category is low, the data is
 # still meaningful.
@@ -60,10 +38,36 @@ def rank_album(stream_log, library):
     return album_dict
 
 
-print(rank_album(streaming_data, library_data))
+# This function sorts artists/tracks by total listening time (in descending order)
+def rank_data(stream_log, rank_by, library=None):
+    if rank_by != 'artist' and rank_by != 'track' and rank_by != 'album':
+        return 'Invalid input'
+    if rank_by == 'artist':
+        rank_by = 'artistName'
+    if rank_by == 'track':
+        rank_by = 'trackName'
+    if rank_by == 'album':
+        return rank_album(stream_log, library)
+    artist_dict = {}
+    for stream in stream_log:
+        if stream[rank_by] not in artist_dict.keys():
+            artist_dict.update({stream[rank_by]: stream['msPlayed']})
+        else:
+            current_msPlayed = artist_dict.get(stream[rank_by])
+            current_msPlayed += stream['msPlayed']
+            artist_dict[stream[rank_by]] = current_msPlayed
+    artist_dict = dict(sorted(artist_dict.items(), key=lambda item: item[1], reverse=True))
+    for artists in artist_dict.keys():
+        artist_dict[artists] = convert_from_ms(artist_dict.get(artists))
+    return artist_dict
 
-rank_album(streaming_data, library_data)
-# def rank_song(stream_log):
-#     #
 
 # rank songs not in library
+def song_not_in_library(stream_log, library):
+    songs_in_library = []
+    for song in library:
+        songs_in_library.append(song['track'])
+    print(songs_in_library)
+
+
+song_not_in_library(streaming_data, library_data)
