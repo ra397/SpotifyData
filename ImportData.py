@@ -86,20 +86,22 @@ def song_not_in_library(stream_log, library):
 #   For all songs that are played for at least 300 ms
 #       if the next song is the same as previous and played for at least 300 ms:
 #       add song to dict with proper value
-def on_repeat(stream_log, rank_by=None, library=None):
+def on_repeat(stream_log, rank_by, library=None):
     repeat = {}
     for i in range(len(stream_log)):
         if stream_log[i]['msPlayed'] >= 300 and i != len(stream_log) - 1:
-            if stream_log[i]['trackName'] == stream_log[i + 1]['trackName']:
-                if stream_log[i]['trackName'] not in repeat.keys():
-                    repeat[stream_log[i]['trackName']] = 1
+            if stream_log[i][rank_by] == stream_log[i + 1][rank_by]:
+                # FIX ERROR HERE
+                if stream_log[i][rank_by] not in repeat.keys():
+                    repeat[stream_log[i][rank_by]] = 1
                 else:
-                    currentPlays = repeat.get(stream_log[i]['trackName'])
-                    repeat.update({stream_log[i]['trackName']: currentPlays + 1})
+                    currentPlays = repeat.get(stream_log[i][rank_by])
+                    repeat.update({stream_log[i][rank_by]: currentPlays + 1})
     repeat = dict(sorted(repeat.items(), key=lambda item: item[1], reverse=True))
     return repeat
 
-print(on_repeat(streaming_data))
+
+print(on_repeat(streaming_data, 'artistName'))
 # am vs pm song/alum/artist rating
 
 # monthly genre rating overtime
