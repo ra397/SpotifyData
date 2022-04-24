@@ -1,6 +1,6 @@
 import json
 
-with open('MyData/StreamingHistory1.json', 'r', encoding='utf-8') as f:
+with open('MyData/StreamingHistory0.json', 'r', encoding='utf-8') as f:
     streaming_data = json.load(f)
 with open('MyData/YourLibrary.json', 'r', encoding='utf-8') as f:
     library_data = json.load(f)['tracks']
@@ -81,16 +81,17 @@ def song_not_in_library(stream_log, library):
     return song_dict
 
 
+print(len(streaming_data))
 # most song listened to on repeat list
 #   create dict that maps songs to number of times listened to in a row
 #   For all songs that are played for at least 300 ms
 #       if the next song is the same as previous and played for at least 300 ms:
 #           add song to dict with proper value
-def on_repeat(stream_log, rank_by, library = None):
-    repeat = {}
-    i = 0
-    for stream in stream_log:
-        if stream['msPlayed'] >= 300:
+# def on_repeat(stream_log, rank_by, library = None):
+#     repeat = {}
+#     i = 0
+#     for stream in stream_log:
+#         if stream['msPlayed'] >= 300:
 
 
 
