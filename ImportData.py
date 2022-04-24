@@ -81,4 +81,20 @@ def song_not_in_library(stream_log, library):
     return song_dict
 
 
-print(song_not_in_library(streaming_data, library_data))
+# most song listened to on repeat list
+#   create dict that maps songs to number of times listened to in a row
+#   For all songs that are played for at least 300 ms
+#       if the next song is the same as previous and played for at least 300 ms:
+#           add song to dict with proper value
+def on_repeat(stream_log, rank_by, library = None):
+    repeat = {}
+    i = 0
+    for stream in stream_log:
+        if stream['msPlayed'] >= 300:
+
+
+
+# am vs pm song/alum/artist rating
+
+# monthly genre rating overtime
+
