@@ -89,19 +89,23 @@ def song_not_in_library(stream_log, library):
 def on_repeat(stream_log, rank_by, library=None):
     repeat = {}
     for i in range(len(stream_log)):
-        if stream_log[i]['msPlayed'] >= 300 and i != len(stream_log) - 1:
-            if stream_log[i][rank_by] == stream_log[i + 1][rank_by]:
-                # FIX ERROR HERE
-                if stream_log[i][rank_by] not in repeat.keys():
-                    repeat[stream_log[i][rank_by]] = 1
-                else:
-                    currentPlays = repeat.get(stream_log[i][rank_by])
-                    repeat.update({stream_log[i][rank_by]: currentPlays + 1})
+        if stream_log[i]['msPlayed'] >= 30000 and i < len(stream_log) - 2:
+            count = 1
+            while stream_log[i][rank_by] == stream_log[i+1][rank_by]\
+                    and stream_log[i]['msPlayed'] >= 30000 and stream_log[i+1]['msPlayed'] >= 30000:
+                count += 1
+                i += 1
+            if stream_log[i][rank_by] not in repeat.keys():
+                repeat[stream_log[i][rank_by]] = 1
+            else:
+                currentMax = repeat.get(stream_log[i][rank_by])
+                if count > currentMax:
+                    repeat.update({stream_log[i][rank_by]: count})
     repeat = dict(sorted(repeat.items(), key=lambda item: item[1], reverse=True))
     return repeat
 
 
-print(on_repeat(streaming_data, 'artistName'))
+print(on_repeat(streaming_data, 'trackName'))
 # am vs pm song/alum/artist rating
 
 # monthly genre rating overtime
