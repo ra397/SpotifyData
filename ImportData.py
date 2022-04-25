@@ -13,7 +13,8 @@ def convert_from_ms(milliseconds):
     days, hours = divmod(hours, 24)
     seconds = seconds + milliseconds / 1000
     seconds = round(seconds)
-    hours += (days * 24)
+    if days != 0:
+        return '{}:{}:{}:{}'.format(days, hours, minutes, seconds)
     return '{}:{}:{}'.format(hours, minutes, seconds)
 
 
@@ -82,17 +83,13 @@ def song_not_in_library(stream_log, library):
 
 
 # most song listened to on repeat list
-#   create dict that maps songs to number of times listened to in a row
-#   For all songs that are played for at least 300 ms
-#       if the next song is the same as previous and played for at least 300 ms:
-#       add song to dict with proper value
 def on_repeat(stream_log, rank_by, library=None):
     repeat = {}
     for i in range(len(stream_log)):
         if stream_log[i]['msPlayed'] >= 30000 and i < len(stream_log) - 2:
             count = 1
-            while stream_log[i][rank_by] == stream_log[i+1][rank_by]\
-                    and stream_log[i]['msPlayed'] >= 30000 and stream_log[i+1]['msPlayed'] >= 30000:
+            while stream_log[i][rank_by] == stream_log[i + 1][rank_by] \
+                    and stream_log[i]['msPlayed'] >= 30000 and stream_log[i + 1]['msPlayed'] >= 30000:
                 count += 1
                 i += 1
             if stream_log[i][rank_by] not in repeat.keys():
@@ -105,7 +102,17 @@ def on_repeat(stream_log, rank_by, library=None):
     return repeat
 
 
-print(on_repeat(streaming_data, 'trackName'))
 # am vs pm song/alum/artist rating
 
 # monthly genre rating overtime
+
+# total all-time listening time
+def total_listening_time(stream_log):
+    msPlayed = 0
+    for stream in stream_log:
+        msPlayed += stream['msPlayed']
+    return convert_from_ms(msPlayed)
+
+
+print(total_listening_time(streaming_data))
+print(rank_data(streaming_data, 'artist'))
