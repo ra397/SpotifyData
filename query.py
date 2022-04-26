@@ -1,4 +1,5 @@
 import json
+import itertools
 
 with open('MyData/StreamingHistory0.json', 'r', encoding='utf-8') as f:
     streaming_data = json.load(f)
@@ -41,13 +42,9 @@ def rank_album(stream_log, library):
 
 # This function sorts artists/tracks by total listening time (in descending order)
 def rank_data(stream_log, rank_by, library=None):
-    if rank_by != 'artist' and rank_by != 'track' and rank_by != 'album':
+    if rank_by != 'artistName' and rank_by != 'trackName' and rank_by != 'albumName':
         return 'Invalid input'
-    if rank_by == 'artist':
-        rank_by = 'artistName'
-    if rank_by == 'track':
-        rank_by = 'trackName'
-    if rank_by == 'album':
+    if rank_by == 'albumName':
         return rank_album(stream_log, library)
     artist_dict = {}
     for stream in stream_log:
@@ -102,11 +99,6 @@ def on_repeat(stream_log, rank_by, library=None):
     return repeat
 
 
-# am vs pm song/alum/artist rating
-
-# monthly genre rating overtime
-
-# total all-time listening time
 def total_listening_time(stream_log):
     msPlayed = 0
     for stream in stream_log:
@@ -114,5 +106,17 @@ def total_listening_time(stream_log):
     return convert_from_ms(msPlayed)
 
 
-print(total_listening_time(streaming_data))
-print(rank_data(streaming_data, 'artist'))
+# Write json file that summarizes query data
+user_data = {'Favorite Songs': dict(itertools.islice(rank_data(streaming_data, 'trackName').items(), 15)),
+             'Favorite Albums': dict(
+                 itertools.islice(rank_data(streaming_data, 'albumName', library_data).items(), 15)),
+             'Favorite Artist': dict(itertools.islice(rank_data(streaming_data, 'artistName').items(), 15)),
+             'Favorite Songs not in Library': dict(
+                 itertools.islice(song_not_in_library(streaming_data, library_data).items(), 15)),
+             'Favorite Artists played repeatedly': dict(
+                 itertools.islice(on_repeat(streaming_data, 'artistName').items(), 15)),
+             'Favorite Songs played repeatedly': dict(
+                 itertools.islice(on_repeat(streaming_data, 'trackName').items(), 15))}
+
+with open('Summary.json', 'w') as f:
+    json.dump(user_data, f, indent=4)
